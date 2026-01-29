@@ -1,0 +1,72 @@
+Ex - 1.2
+
+Q2
+
+CREATE TABLE Employees (
+    EmpID INT PRIMARY KEY,
+    Name VARCHAR(100),
+    Salary DECIMAL(10,2),
+    Department VARCHAR(50)
+);
+
+Q3
+
+INSERT INTO Employees (EmpID, Name, Salary, Department) 
+VALUES (1, 'John Doe', 50000.00, 'HR');
+INSERT INTO Employees (EmpID, Name, Salary, Department) 
+VALUES (1, 'John Doe', 50000.00, 'HR');
+INSERT INTO Employees (EmpID, Name, Salary, Department) 
+VALUES (1, 'John Doe', 50000.00, 'HR');
+INSERT INTO Employees (EmpID, Name, Salary, Department) 
+VALUES (1, 'John Doe', 50000.00, 'HR');
+INSERT INTO Employees (EmpID, Name, Salary, Department) 
+VALUES (1, 'John Doe', 50000.00, 'HR');
+
+UPDATE Employees 
+SET Salary = 70000.00 
+WHERE EmpID = 1;
+
+DELETE FROM Employees WHERE EmpID = 2;
+
+Q4
+
+Q5
+
+CREATE TABLE products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(50),
+    category VARCHAR(50),
+    price DECIMAL(10, 2),
+    stock_quantity INT
+);
+
+INSERT INTO products (product_id, product_name, category, price, stock_quantity) VALUES
+(1, 'Laptop', 'Electronics', 999.99, 150),
+(2, 'T-Shirt', 'Clothing', 19.99, 500),
+(3, 'Coffee Maker', 'Appliances', 45.50, 75),
+(4, 'Novel', 'Books', 14.99, 200),
+(5, 'Running Shoes', 'Footwear', 75.00, 120);
+
+Q6
+
+SELECT * FROM products;
+
+SELECT * FROM products WHERE category = 'Electronics';
+
+SELECT * FROM products WHERE price < 100;
+
+Q7
+
+UPDATE products SET price = price * 1.10 WHERE category = 'Clothing';
+
+UPDATE Products
+SET stock_quantity = 100
+WHERE product_id = 3;
+
+Q8
+
+DELETE FROM Products
+WHERE product_id = 1;
+
+DELETE FROM Products
+WHERE stock_quantity = 0;

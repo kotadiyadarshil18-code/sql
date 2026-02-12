@@ -1,0 +1,153 @@
+CREATE DATABASE DataTransformer;
+USE DataTransformer;
+
+#1
+
+CREATE TABLE customer (
+    customer_ID INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    email VARCHAR(100),
+    registration_date DATE
+);
+
+#2
+
+INSERT INTO customer VALUES
+(1, 'John', 'Doe', ' john.doe@email.com ', '2022-03-15'),
+(2, 'Jane', 'Smith', ' jane.smith@email.com ', '2021-11-02');
+
+#3
+
+CREATE TABLE orders (
+    order_ID INT PRIMARY KEY,
+    customer_ID INT,
+    order_Date DATE,
+    total_amount DECIMAL(10,2),
+    FOREIGN KEY (customer_ID) REFERENCES customer(customer_ID)
+);
+
+#4
+
+INSERT INTO Orders VALUES
+(101, 1, '2023-07-01', 150.50),
+(102, 2, '2023-07-03', 200.75);
+
+#5
+
+CREATE TABLE employee (
+    employee_ID INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    department VARCHAR(50),
+    hire_date DATE,
+    salary DECIMAL(10,2)
+);
+
+#6
+
+INSERT INTO Employees VALUES
+(1, 'Mark', 'Johnson', 'Sales', '2020-01-15', 50000.00),
+(2, 'Susan', 'Lee', 'HR', '2021-03-20', 55000.00);
+
+
+SELECT c.customer_ID, c.first_name, c.last_name, o.order_ID, o.total_amount
+FROM customer c
+INNER JOIN orders o ON c.customer_ID = o.customer_ID;
+
+SELECT c.customer_ID, c.first_name, o.order_ID
+FROM customer c
+LEFT JOIN orders o ON c.customer_ID = o.customer_ID;
+
+
+SELECT c.first_name, o.order_ID, o.total_amount
+FROM customer c
+RIGHT JOIN orders o ON c.customer_ID = o.customer_ID;
+
+SELECT c.customer_ID, o.order_ID
+FROM customer c
+LEFT JOIN orders o ON c.customer_ID = o.customer_ID
+UNION
+SELECT c.customer_ID, o.order_ID
+FROM customer c
+RIGHT JOIN Orders o ON c.customer_ID = o.customer_ID;
+
+
+SELECT *
+FROM customer
+WHERE customer_ID IN (
+    SELECT customer_ID
+    FROM orders
+    WHERE total_amount > (SELECT AVG(total_amount) FROM orders)
+);
+
+
+SELECT *
+FROM employee
+WHERE salary > (SELECT AVG(salary) FROM employee);
+
+
+SELECT order_ID,
+       YEAR(order_date) AS OrderYear,
+       MONTH(order_date) AS OrderMonth
+FROM orders;
+
+
+SELECT order_ID,
+       DATEDIFF(CURDATE(), order_Date) AS DaysDifference
+FROM orders;
+
+
+SELECT order_ID,
+       DATE_FORMAT(order_Date, '%d-%b-%Y') AS FormattedDate
+FROM orders
+
+
+SELECT customer_ID,
+       CONCAT(first_name, ' ', last_name) AS FullName
+FROM customer;
+
+
+SELECT REPLACE(first_name, 'John', 'Jonathan') AS UpdatedName
+FROM customer;
+
+
+SELECT UPPER(first_name) AS FirstNameUpper,
+       LOWER(last_name) AS LastNameLower
+FROM customer;
+
+
+SELECT TRIM(email) AS CleanEmail
+FROM customer;
+
+
+SELECT order_ID,
+       total_amount,
+       SUM(total_amount) OVER (ORDER BY order_Date) AS RunningTotal
+FROM orders;
+
+
+SELECT order_ID,
+       total_amount,
+       RANK() OVER (ORDER BY total_amount DESC) AS AmountRank
+FROM orders;
+
+
+SELECT order_ID,
+       total_amount,
+       CASE
+           WHEN total_amount > 1000 THEN '10% Discount'
+           WHEN total_amount > 500 THEN '5% Discount'
+           ELSE 'No Discount'
+       END AS Discount
+FROM orders;
+
+
+SELECT employee_ID,
+       salary,
+       CASE
+           WHEN salary >= 60000 THEN 'High'
+           WHEN salary >= 50000 THEN 'Medium'
+           ELSE 'Low'
+       END AS SalaryCategory
+FROM employee;

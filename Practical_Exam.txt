@@ -1,0 +1,345 @@
+
+CREATE TABLE student(
+    student_id INT PRIMARY KEY,
+    name VARCHAR (50),
+    dob DATE,
+    gender VARCHAR(50),
+    email VARCHAR(100),
+    phone_number INT,
+    address VARCHAR(100),
+    admission_date DATE,
+    department_id INT,
+    FOREIGN KEY (department_id) REFERENCES department(department_id)
+);
+    
+
+CREATE TABLE department(
+    department_id INT PRIMARY KEY,
+    department_name VARCHAR(50)
+);
+
+
+CREATE TABLE faculty(
+    faculty_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    email VARCHAR(100),
+    phone_number INT,
+    department_id INT,
+    FOREIGN KEY (department_id) REFERENCES department(department_id)
+);
+
+
+
+CREATE TABLE courses(
+    course_id INT PRIMARY KEY,
+    courses_name VARCHAR(50),
+    faculty_id INT,
+    FOREIGN KEY (faculty_id) REFERENCES faculty (faculty_id)
+);
+
+
+
+CREATE TABLE enrollment (
+    enrollment_id INT PRIMARY KEY,
+    student_id INT,
+    FOREIGN KEY (student_id) REFERENCES student (student_id),
+    course_id INT,
+    FOREIGN KEY (course_id) REFERENCES courses (course_id),
+    enrollment_date DATE
+);   
+
+
+CREATE TABLE Attendance (
+    attendance_id INT PRIMARY KEY,
+    student_id INT,
+    FOREIGN KEY (student_id) REFERENCES student (student_id),
+    course_id INT,
+    FOREIGN KEY (course_id) REFERENCES courses (course_id),
+    attendance_date DATE,
+    status VARCHAR(50)
+);
+
+
+
+CREATE TABLE grade(
+    grade_id INT PRIMARY KEY,
+    student_id INT,
+    FOREIGN KEY (student_id) REFERENCES student (student_id),
+    course_id INT,
+    FOREIGN KEY (course_id) REFERENCES courses (course_id),
+    mark_obtained DECIMAL(10,2),
+    grade VARCHAR(50)
+);
+
+
+
+INSERT INTO department (department_id, department_name) VALUES
+(101, 'Computer Science'),
+(102, 'Mechanical'),
+(103, 'Electrical'),
+(104, 'Civil'),
+(105, 'Business Administration');
+
+
+INSERT INTO student 
+(student_id, name, dob, gender, email, phone_number, address, admission_date, department_id) VALUES
+(1, 'Aarav Patel', '2003-05-12', 'Male', 'aarav@gmail.com', 9876543210, 'Ahmedabad', '2022-06-15', 101),
+(2, 'Neha Shah', '2002-08-20', 'Female', 'neha@gmail.com', 9876501234, 'Surat', '2021-06-10', 102),
+(3, 'Rohan Mehta', '2003-01-18', 'Male', 'rohan@gmail.com', 9876512345, 'Rajkot', '2022-06-15', 103),
+(4, 'Priya Desai', '2002-11-25', 'Female', 'priya@gmail.com', 9876523456, 'Vadodara', '2021-06-10', 104),
+(5, 'Kunal Joshi', '2003-03-30', 'Male', 'kunal@gmail.com', 9876534567, 'Bhavnagar', '2022-06-15', 105);
+
+
+
+INSERT INTO faculty 
+(faculty_id, name, email, phone_number, department_id) VALUES
+(201, 'Dr. Sharma', 'sharma@gmail.com', 9123456780, 101),
+(202, 'Prof. Iyer', 'iyer@gmail.com', 9123456781, 102),
+(203, 'Dr. Singh', 'singh@gmail.com', 9123456782, 103),
+(204, 'Prof. Patel', 'patel@gmail.com', 9123456783, 104),
+(205, 'Dr. Verma', 'verma@gmail.com', 9123456784, 105);
+
+
+INSERT INTO courses 
+(course_id, courses_name, faculty_id) VALUES
+(301, 'Database Management', 201),
+(302, 'Thermodynamics', 202),
+(303, 'Circuit Theory', 203),
+(304, 'Structural Engineering', 204),
+(305, 'Marketing Management', 205);
+
+
+INSERT INTO enrollment 
+(enrollment_id, student_id, course_id, enrollment_date) VALUES
+(401, 1, 301, '2022-07-01'),
+(402, 2, 302, '2021-07-01'),
+(403, 3, 303, '2022-07-01'),
+(404, 4, 304, '2021-07-01'),
+(405, 5, 305, '2022-07-01');
+
+
+INSERT INTO Attendance
+(attendance_id, student_id, course_id, attendance_date, status) VALUES
+(501, 1, 301, '2022-08-01', 'Present'),
+(502, 2, 302, '2021-08-01', 'Absent'),
+(503, 3, 303, '2022-08-01', 'Present'),
+(504, 4, 304, '2021-08-01', 'Present'),
+(505, 5, 305, '2022-08-01', 'Absent');
+
+
+INSERT INTO student 
+(student_id, name, dob, gender, email, phone_number, address, admission_date, department_id)
+VALUES (6, 'Manav Kumar', '2003-09-10', 'Male', 'manav@gmail.com', 9876541111, 'Surat', '2023-06-15', 101);
+
+
+UPDATE student
+SET email = 'newemail@gmail.com'
+WHERE student_id = 1;
+
+
+DELETE FROM student
+WHERE student_id = 6;
+
+
+
+SELECT s.student_id, s.name
+FROM student s
+JOIN department d ON s.department_id = d.department_id
+WHERE d.department_name = 'Computer Science';
+
+
+SELECT s.student_id, s.name, g.mark_obtained
+FROM student s
+JOIN grade g ON s.student_id = g.student_id
+ORDER BY g.mark_obtained DESC
+LIMIT 10;
+
+
+
+SELECT s.student_id, s.name,
+       (SUM(CASE WHEN a.status='Present' THEN 1 ELSE 0 END)/COUNT(*)*100) AS attendance_percentage
+FROM student s
+JOIN Attendance a ON s.student_id = a.student_id
+GROUP BY s.student_id, s.name
+HAVING attendance_percentage < 75;
+
+
+
+SELECT s.student_id, s.name
+FROM student s
+JOIN grade g ON s.student_id = g.student_id
+JOIN Attendance a ON s.student_id = a.student_id
+GROUP BY s.student_id, s.name, g.mark_obtained
+HAVING 
+(SUM(CASE WHEN a.status='Present' THEN 1 ELSE 0 END)/COUNT(*)*100) < 50
+AND g.mark_obtained < 40;
+
+
+
+SELECT f.faculty_id, f.name
+FROM faculty f
+LEFT JOIN courses c ON f.faculty_id = c.faculty_id
+WHERE c.course_id IS NULL;
+
+
+SELECT * FROM student
+ORDER BY name ASC;
+
+
+SELECT d.department_name, COUNT(s.student_id) AS total_students
+FROM department d
+LEFT JOIN student s ON d.department_id = s.department_id
+GROUP BY d.department_name;
+
+
+SELECT c.courses_name, AVG(g.mark_obtained) AS avg_marks
+FROM courses c
+JOIN grade g ON c.course_id = g.course_id
+GROUP BY c.courses_name;
+
+
+SELECT s.student_id, s.name,
+(SUM(CASE WHEN a.status='Present' THEN 1 ELSE 0 END)/COUNT(*)*100) AS attendance_percentage
+FROM student s
+JOIN Attendance a ON s.student_id = a.student_id
+GROUP BY s.student_id, s.name;
+
+
+SELECT c.courses_name,
+MAX(g.mark_obtained) AS highest_marks,
+MIN(g.mark_obtained) AS lowest_marks
+FROM courses c
+JOIN grade g ON c.course_id = g.course_id
+GROUP BY c.courses_name;
+
+
+SELECT department_id, COUNT(student_id) AS total_students
+FROM student
+GROUP BY department_id;
+
+
+ALTER TABLE enrollment
+ADD CONSTRAINT unique_enrollment
+UNIQUE (student_id, course_id);
+
+
+SELECT s.student_id, s.name, s.email, d.department_name
+FROM student s
+INNER JOIN department d 
+ON s.department_id = d.department_id;
+
+
+SELECT s.student_id, s.name
+FROM student s
+LEFT JOIN enrollment e 
+ON s.student_id = e.student_id
+WHERE e.enrollment_id IS NULL;
+
+
+SELECT c.course_id, c.courses_name
+FROM faculty f
+RIGHT JOIN courses c
+ON f.faculty_id = c.faculty_id
+WHERE f.faculty_id IS NULL;
+
+
+SELECT s.student_id, s.name
+FROM student s
+FULL OUTER JOIN grade g
+ON s.student_id = g.student_id
+WHERE g.grade_id IS NULL;
+
+
+SELECT student_id, name
+FROM student
+WHERE student_id IN (
+    SELECT student_id
+    FROM grade
+    WHERE mark_obtained > (
+        SELECT AVG(mark_obtained) FROM grade
+    )
+);
+
+
+SELECT courses_name
+FROM courses
+WHERE faculty_id IN (
+    SELECT faculty_id
+    FROM faculty
+    WHERE experience_years >= 5
+);
+
+
+SELECT student_id
+FROM Attendance
+WHERE status = 'Absent'
+GROUP BY student_id
+HAVING COUNT(*) > 10;
+
+
+SELECT attendance_id, 
+       MONTH(attendance_date) AS attendance_month
+FROM Attendance;
+
+
+SELECT student_id, name,
+       TIMESTAMPDIFF(YEAR, admission_date, CURDATE()) AS years_since_admission
+FROM student;
+
+
+SELECT attendance_id,
+       DATE_FORMAT(attendance_date, '%d-%m-%Y') AS formatted_date
+FROM Attendance;
+
+
+SELECT UPPER(name) AS faculty_name
+FROM faculty;
+
+
+SELECT TRIM(name) AS cleaned_name
+FROM student;
+
+
+SELECT name,
+       IFNULL(email, 'Email Not Provided') AS email
+FROM student;
+
+
+SELECT s.student_id, s.name,
+SUM(g.mark_obtained) AS total_marks,
+RANK() OVER (ORDER BY SUM(g.mark_obtained) DESC) AS student_rank
+FROM student s
+JOIN grade g ON s.student_id = g.student_id
+GROUP BY s.student_id, s.name;
+
+
+SELECT course_id, attendance_date,
+COUNT(student_id) OVER (PARTITION BY course_id ORDER BY attendance_date) 
+AS cumulative_attendance
+FROM Attendance;
+
+
+SELECT 
+MONTH(enrollment_date) AS month,
+COUNT(student_id) OVER (ORDER BY MONTH(enrollment_date)) AS running_total
+FROM enrollment;
+
+
+SELECT student_id, mark_obtained,
+CASE 
+    WHEN mark_obtained > 90 THEN 'Excellent'
+    WHEN mark_obtained BETWEEN 75 AND 90 THEN 'Good'
+    ELSE 'Needs Improvement'
+END AS performance
+FROM grade;
+
+
+SELECT student_id,
+(SUM(CASE WHEN status='Present' THEN 1 ELSE 0 END)/COUNT(*)*100) AS attendance_percentage,
+CASE
+    WHEN (SUM(CASE WHEN status='Present' THEN 1 ELSE 0 END)/COUNT(*)*100) > 80 THEN 'Regular'
+    WHEN (SUM(CASE WHEN status='Present' THEN 1 ELSE 0 END)/COUNT(*)*100) BETWEEN 50 AND 80 THEN 'Irregular'
+    ELSE 'Defaulter'
+END AS attendance_category
+FROM Attendance
+GROUP BY student_id;
